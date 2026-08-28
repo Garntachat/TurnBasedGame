@@ -28,6 +28,10 @@ public class Game : MonoBehaviour
     private int currentAttackerIndex = -1;
     private List<bool> previousAvailability = new List<bool>();
     private bool isProcessing = false;
+    private bool isUniqueAction = false; // true = กำลังเลือกเป้าหมายให้สกิล unique อยู่ (ไม่ใช่ attack ปกติ)
+
+    [Header("Unique Buttons")]
+    public List<Button> uniqueButtons;
 
     void Start()
     {
@@ -41,6 +45,11 @@ public class Game : MonoBehaviour
         {
             int index = i;
             takeDamageButtons[i].onClick.AddListener(() => OnTakeDamageButtonClick(index));
+        }
+        for (int i = 0; i < uniqueButtons.Count; i++)
+        {
+            int index = i;
+            uniqueButtons[i].onClick.AddListener(() => OnUniqueButtonClick(index));
         }
     }
 
@@ -74,6 +83,17 @@ public class Game : MonoBehaviour
         {
             takeDamageButtons[i].gameObject.SetActive(i != currentAttackerIndex);
         }
+
+        SetTakeDamageButtonLabels("Attack");
+    }
+
+    private void SetTakeDamageButtonLabels(string label)
+    {
+        foreach (Button btn in takeDamageButtons)
+        {
+            Text btnText = btn.GetComponentInChildren<Text>();
+            if (btnText != null) btnText.text = label;
+        }
     }
 
 public void OnTakeDamageButtonClick(int characterIndex)
@@ -89,6 +109,37 @@ public void OnTakeDamageButtonClick(int characterIndex)
     if (currentAttacker == null)
     {
         Debug.LogWarning("No attacker selected yet!");
+        return;
+    }
+
+    if (isUniqueAction)
+    {
+        CharacterStat uniqueTarget = characters[characterIndex].GetComponent<CharacterStat>();
+        if (uniqueTarget == null)
+        {
+            Debug.LogWarning("Target has no CharacterStat component!");
+            return;
+        }
+
+        if (currentAttacker.role == CharacterClass.Healer)
+        {
+            uniqueTarget.hp += currentAttacker.unique;
+            if (uniqueTarget.hp > uniqueTarget.maxHp) uniqueTarget.hp = uniqueTarget.maxHp;
+            Debug.Log(currentAttacker.name + " healed " + uniqueTarget.name + " for " + currentAttacker.unique + "! Current HP: " + uniqueTarget.hp);
+        }
+        else // Mage
+        {
+            uniqueTarget.hp -= currentAttacker.unique;
+            Debug.Log(uniqueTarget.name + " was hit by " + currentAttacker.name + "'s unique skill for " + currentAttacker.unique + " damage! Remaining HP: " + uniqueTarget.hp);
+
+            if (uniqueTarget.hp <= 0)
+            {
+                uniqueTarget.hp = 0;
+                Debug.Log(uniqueTarget.name + " has been defeated!");
+            }
+        }
+
+        StartCoroutine(PauseThenResolve());
         return;
     }
 
@@ -136,6 +187,60 @@ public void OnTakeDamageButtonClick(int characterIndex)
     StartCoroutine(PauseThenResolve());
 }
 
+public void OnUniqueButtonClick(int casterIndex)
+{
+    if (isProcessing) return;
+    if (casterIndex < 0 || casterIndex >= characters.Count) return;
+
+    CharacterStat caster = characters[casterIndex].GetComponent<CharacterStat>();
+    if (caster == null || caster.hp <= 0) return;
+
+    switch(caster.role)
+    {
+        case CharacterClass.Leader:
+            // TODO: skill ของ Leader
+            break;
+
+        case CharacterClass.Mage:
+        case CharacterClass.Healer:
+            // เข้าโหมดเลือกเป้าหมายเดียว ผลลัพธ์จริงไปเกิดที่ OnTakeDamageButtonClick
+            BeginUniqueTargetSelect(casterIndex, caster);
+            break;
+
+        case CharacterClass.Tank:
+            // TODO: skill ของ Tank
+            break;
+    }
+}
+
+private void BeginUniqueTargetSelect(int casterIndex, CharacterStat caster)
+{
+    isUniqueAction = true;
+    currentAttackerIndex = casterIndex;
+    currentAttacker = caster;
+
+    Debug.Log(characters[casterIndex].name + " is using a unique skill! Choose a target.");
+
+    previousAvailability.Clear();
+    foreach (HoverEffect character in characters)
+    {
+        previousAvailability.Add(character.available);
+    }
+
+    foreach (HoverEffect character in characters)
+    {
+        character.SetAvailable(false);
+    }
+
+    for (int i = 0; i < takeDamageButtons.Count; i++)
+    {
+        takeDamageButtons[i].gameObject.SetActive(i != currentAttackerIndex);
+    }
+
+    string label = (caster.role == CharacterClass.Healer) ? "Heal" : "Attack";
+    SetTakeDamageButtonLabels(label);
+}
+
 private IEnumerator PauseThenResolve()
 {
     isProcessing = true;
@@ -157,6 +262,7 @@ private IEnumerator PauseThenResolve()
 
     currentAttacker = null;
     currentAttackerIndex = -1;
+    isUniqueAction = false;
     isProcessing = false;
 
     if (attackerWasPlayer)

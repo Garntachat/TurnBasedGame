@@ -300,8 +300,13 @@ MonoBehaviour:
   - {fileID: 595964913}
   enemies:
   - {fileID: 1019320582}
-  allyFriendlyFireChance: 0.4
+  allyFriendlyFireChance: 0.35720924
   normalAttackMissTargetChance: 0.2
+  uniqueButtons:
+  - {fileID: 498489393}
+  - {fileID: 301176068}
+  - {fileID: 1950036498}
+  - {fileID: 48168}
 --- !u!4 &1202441
 Transform:
   m_ObjectHideFlags: 0
@@ -6389,7 +6394,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Splash
+  m_Text: Heal
 --- !u!222 &1902072212
 CanvasRenderer:
   m_ObjectHideFlags: 0
