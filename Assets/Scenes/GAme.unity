@@ -307,6 +307,8 @@ MonoBehaviour:
   - {fileID: 301176068}
   - {fileID: 1950036498}
   - {fileID: 48168}
+  betrayalChance: 0.781
+  betrayalUseUniqueChance: 0.5
 --- !u!4 &1202441
 Transform:
   m_ObjectHideFlags: 0

@@ -33,6 +33,11 @@ public class Game : MonoBehaviour
     [Header("Unique Buttons")]
     public List<Button> uniqueButtons;
 
+    [Header("Betrayal Settings")]
+    [Range(0f, 1f)] public float betrayalChance = 0.3f;
+    [Range(0f, 1f)] public float betrayalUseUniqueChance = 0.5f;
+    private int traitorIndex = -1;
+
     void Start()
     {
         for (int i = 0; i < attackButtons.Count; i++)
@@ -51,7 +56,20 @@ public class Game : MonoBehaviour
             int index = i;
             uniqueButtons[i].onClick.AddListener(() => OnUniqueButtonClick(index));
         }
-    }
+
+        List<int> eligibleTraitorIndices = new List<int>();
+        for (int i = 1; i <= 3; i++)
+        {
+            if (i >= characters.Count) continue;
+            eligibleTraitorIndices.Add(i);
+        }
+        if (eligibleTraitorIndices.Count > 0)
+        {
+            traitorIndex = eligibleTraitorIndices[Random.Range(0, eligibleTraitorIndices.Count)];
+            Debug.Log("[DEBUG] Traitor this run: " + characters[traitorIndex].name);
+        }
+            
+        }
 
     public void OnAttackButtonClick(int attackerIndex)
     {
@@ -63,6 +81,8 @@ public class Game : MonoBehaviour
             return;
         }
 
+        CharacterStat attackerStat = characters[attackerIndex].GetComponent<CharacterStat>();
+        if (attackerStat == null || attackerStat.hp <= 0) return;
         currentAttackerIndex = attackerIndex;
         currentAttacker = characters[attackerIndex].GetComponent<CharacterStat>();
 
@@ -121,27 +141,13 @@ public void OnTakeDamageButtonClick(int characterIndex)
             return;
         }
 
-        if (currentAttacker.role == CharacterClass.Healer)
-        {
-            uniqueTarget.hp += currentAttacker.unique;
-            if (uniqueTarget.hp > uniqueTarget.maxHp) uniqueTarget.hp = uniqueTarget.maxHp;
-            Debug.Log(currentAttacker.name + " healed " + uniqueTarget.name + " for " + currentAttacker.unique + "! Current HP: " + uniqueTarget.hp);
-        }
-        else // Mage
-        {
-            uniqueTarget.hp -= currentAttacker.unique;
-            Debug.Log(uniqueTarget.name + " was hit by " + currentAttacker.name + "'s unique skill for " + currentAttacker.unique + " damage! Remaining HP: " + uniqueTarget.hp);
-
-            if (uniqueTarget.hp <= 0)
-            {
-                uniqueTarget.hp = 0;
-                Debug.Log(uniqueTarget.name + " has been defeated!");
-            }
-        }
+        ApplyUniqueEffect(currentAttacker, uniqueTarget);
 
         StartCoroutine(PauseThenResolve());
         return;
     }
+
+    if (TryResolveBetrayal()) return;
 
     int finalTargetIndex = characterIndex;
     bool attackerIsPlayer = (currentAttackerIndex == 0);
@@ -208,8 +214,7 @@ public void OnUniqueButtonClick(int casterIndex)
             break;
 
         case CharacterClass.Tank:
-            caster.isGuarding = !caster.isGuarding;
-            Debug.Log(characters[casterIndex].name + (caster.isGuarding ? " is now guarding the party!" : " stopped guarding."));
+            ApplyUniqueEffect(caster, null);
             break;
     }
 }
@@ -240,6 +245,81 @@ private void BeginUniqueTargetSelect(int casterIndex, CharacterStat caster)
 
     string label = (caster.role == CharacterClass.Healer) ? "Heal" : "Attack";
     SetTakeDamageButtonLabels(label);
+}
+
+private void ApplyUniqueEffect(CharacterStat caster, CharacterStat target)
+    {
+        switch (caster.role)
+        {
+            case CharacterClass.Healer:
+                target.hp += caster.unique;
+                if (target.hp > target.maxHp) target.hp = target.maxHp;
+                Debug.Log(caster.name + " healed " + target.name + " for " + caster.unique + "! Current HP: " + target.hp);
+                break;
+
+            case CharacterClass.Mage:
+                target.hp -= caster.unique;
+                Debug.Log(target.name + " was hit by " + caster.name + "'s unique skill for " + caster.unique + " damage! Remaining HP: " + target.hp);
+                if (target.hp <= 0)
+                {
+                    target.hp = 0;
+                    Debug.Log(target.name + " has been defeated!");
+                }
+                break;
+
+            case CharacterClass.Tank:
+                caster.isGuarding = true; // target ไม่ได้ใช้ — Tank guard ตัวเองเสมอ
+                Debug.Log(caster.name + " activated Guard for this round!");
+                break;
+        }
+    }
+
+private bool TryResolveBetrayal()
+{
+    if (currentAttackerIndex != traitorIndex) return false;
+    if (Random.value >= betrayalChance) return false;
+
+    bool useUnique = Random.value < betrayalUseUniqueChance;
+
+    if (useUnique && currentAttacker.role == CharacterClass.Tank)
+        {
+            Debug.Log(currentAttacker.name + " ignored the order and guarded instead!");
+            ApplyUniqueEffect(currentAttacker, null);
+            StartCoroutine(PauseThenResolve());
+            return true;
+        }        
+    
+    List<HoverEffect> validTargets = new List<HoverEffect>();
+    for (int i = 0; i < characters.Count; i++)
+        {
+            if (i == currentAttackerIndex) continue;
+            CharacterStat stat = characters[i].GetComponent<CharacterStat>();
+            if (stat != null && stat.hp > 0)
+                validTargets.Add(characters[i]);
+        }
+    
+    if (validTargets.Count == 0) return false;
+
+    HoverEffect betrayTargetHover = validTargets[Random.Range(0, validTargets.Count)];
+    CharacterStat betrayTarget = betrayTargetHover.GetComponent<CharacterStat>();
+
+    if (useUnique){
+        Debug.Log(currentAttacker.name + " ignored the order and used their unique skill on " + betrayTargetHover.name + " instead!");
+        ApplyUniqueEffect(currentAttacker, betrayTarget);
+    } else {
+        Debug.Log(currentAttacker.name + " ignored the order and attacked " + betrayTargetHover.name + " instead!");
+        betrayTarget.hp -= currentAttacker.atk;
+        Debug.Log(betrayTargetHover.name + " took " + currentAttacker.atk + " damage! Remaining HP: " + betrayTarget.hp);
+
+        if (betrayTarget.hp <= 0)
+        {
+            betrayTarget.hp = 0;
+            Debug.Log(betrayTargetHover.name + " has been defeated!");
+        }
+    }
+
+    StartCoroutine(PauseThenResolve());
+    return true;
 }
 
 private IEnumerator PauseThenResolve()
@@ -420,6 +500,12 @@ private IEnumerator EndTurnRoutine()
 
         yield return new WaitForSeconds(1f);
     }
+
+    foreach (HoverEffect character in characters)
+        {
+            CharacterStat stat = character.GetComponent<CharacterStat>();
+            if (stat != null) stat.isGuarding = false;
+        }
 
     isProcessing = false;
 }
