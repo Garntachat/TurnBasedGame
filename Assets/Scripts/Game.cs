@@ -239,6 +239,7 @@ private IEnumerator AlliesAutoAttack()
     }
 
     isProcessing = false;
+    EndTurn();
 }
     // ---------- END TURN ----------
 

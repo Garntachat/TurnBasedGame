@@ -67,5 +67,5 @@
         "*.sln": "*.csproj",
         "*.slnx": "*.csproj"
     },
-    "dotnet.defaultSolution": "turnbased.slnx"
+    "dotnet.defaultSolution": "TurnBasedGame.slnx"
 }

@@ -2932,10 +2932,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d83cbe8c5b46e0c44a4289f53ff705d8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CharacterStat
-  maxHp: 100
-  hp: 100
-  atk: 10
-  unique: 0
+  maxHp: 50
+  hp: 50
+  atk: 2
+  unique: 20
+  role: 2
   hpText: {fileID: 1614157635}
   atkText: {fileID: 1455227708}
   uniqueText: {fileID: 339366531}
@@ -3126,10 +3127,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d83cbe8c5b46e0c44a4289f53ff705d8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CharacterStat
-  maxHp: 100
-  hp: 100
-  atk: 10
-  unique: 0
+  maxHp: 110
+  hp: 110
+  atk: 30
+  unique: 45
+  role: 0
   hpText: {fileID: 1199572986}
   atkText: {fileID: 1270456463}
   uniqueText: {fileID: 801244360}
@@ -3426,10 +3428,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d83cbe8c5b46e0c44a4289f53ff705d8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CharacterStat
-  maxHp: 100
-  hp: 100
-  atk: 20
-  unique: 15
+  maxHp: 55
+  hp: 55
+  atk: 2
+  unique: 25
+  role: 1
   hpText: {fileID: 1682559828}
   atkText: {fileID: 1699362920}
   uniqueText: {fileID: 14267768}
@@ -5409,10 +5412,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d83cbe8c5b46e0c44a4289f53ff705d8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CharacterStat
-  maxHp: 100
-  hp: 100
+  maxHp: 85
+  hp: 85
   atk: 10
-  unique: 0
+  unique: 15
+  role: 3
   hpText: {fileID: 1698840262}
   atkText: {fileID: 2131739647}
   uniqueText: {fileID: 746622328}
@@ -6292,10 +6296,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d83cbe8c5b46e0c44a4289f53ff705d8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  maxHp: 100
-  hp: 100
-  atk: 20
+  maxHp: 75
+  hp: 75
+  atk: 12
   unique: 0
+  role: 0
   hpText: {fileID: 189631798}
   atkText: {fileID: 1027130329}
   uniqueText: {fileID: 1477606766}
