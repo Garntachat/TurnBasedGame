@@ -8,6 +8,7 @@ public class CharacterStat : MonoBehaviour
     public int atk = 10;
     public int unique = 0; // was "= null" — int can't be null, fixed to 0
     public CharacterClass role;
+    public bool isGuarding = false; 
 
     [Header("UI References (Legacy Text)")]
     public Text hpText;

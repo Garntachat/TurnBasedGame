@@ -208,7 +208,8 @@ public void OnUniqueButtonClick(int casterIndex)
             break;
 
         case CharacterClass.Tank:
-            // TODO: skill ของ Tank
+            caster.isGuarding = !caster.isGuarding;
+            Debug.Log(characters[casterIndex].name + (caster.isGuarding ? " is now guarding the party!" : " stopped guarding."));
             break;
     }
 }
@@ -391,6 +392,22 @@ private IEnumerator EndTurnRoutine()
 
         HoverEffect chosenTargetHover = validTargets[Random.Range(0, validTargets.Count)];
         CharacterStat chosenTarget = chosenTargetHover.GetComponent<CharacterStat>();
+
+        foreach (HoverEffect guardHover in characters)
+        {
+            if (enemies.Contains(guardHover)) continue;
+            CharacterStat guardStat = guardHover.GetComponent<CharacterStat>();
+            if (guardStat != null && guardStat.isGuarding && guardStat.hp > 0)
+                {
+                    if (chosenTargetHover != guardHover)
+                    {
+                        Debug.Log(guardHover.name + " jumped in front of " + chosenTargetHover.name + " to take the hit!");
+                        chosenTargetHover = guardHover;
+                        chosenTarget = guardStat;
+                        break;
+                    }
+                }        
+        }
 
         chosenTarget.hp -= enemyStat.atk;
         Debug.Log(enemyHover.name + " attacked " + chosenTargetHover.name + " for " + enemyStat.atk + " damage! Remaining HP: " + chosenTarget.hp);
