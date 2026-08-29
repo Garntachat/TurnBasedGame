@@ -16,6 +16,9 @@ public class HoverEffect : MonoBehaviour
 
     public void OnHoverEnterEffect(GameObject go)
     {
+        CharacterStat stat = GetComponent<CharacterStat>();
+        if (stat != null && stat.hp <= 0) return;
+
         go.transform.localScale = new Vector3(1.1f, 1.1f, 1f);
         if (available)
         {
@@ -48,7 +51,9 @@ public class HoverEffect : MonoBehaviour
 
     private void UpdateAvailableStatus()
     {
+        CharacterStat stat = GetComponent<CharacterStat>();
+        bool isAlive = (stat != null || stat.hp > 0);
         if (availableStatus != null)
-            availableStatus.SetActive(available);
+            availableStatus.SetActive(available && isAlive);
     }
 }
