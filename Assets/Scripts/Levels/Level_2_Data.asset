@@ -16,6 +16,10 @@ MonoBehaviour:
   enemies:
   - enemyPrefab: {fileID: 919132149155446097, guid: adaeac9788ea82e4eb6ff989b1e20f0e, type: 3}
     spawnPointIndex: 0
-  monologueLines: []
+    maxHp: 40
+    atk: 2
+    unique: 2
+  monologueLines:
+  - '"Hmm why some teammates don''t do as I order"'
   secondPerLine: 2
   isCampPhase: 1

@@ -24,12 +24,15 @@ public class Game : MonoBehaviour
     [Header("Normal Attack Settings")]
     [Range(0f, 1f)]
     public float normalAttackMissTargetChance = 0.15f;
+    [Header("Level")]
+    public LevelManager levelManager;
 
     private CharacterStat currentAttacker;
     private int currentAttackerIndex = -1;
     private List<bool> previousAvailability = new List<bool>();
     private bool isProcessing = false;
     private bool isUniqueAction = false;
+    private bool battleEnded = false;
 
     [Header("Unique Buttons")]
     public List<Button> uniqueButtons;
@@ -120,7 +123,7 @@ public class Game : MonoBehaviour
 
     public void OnAttackButtonClick(int attackerIndex)
     {
-        if (isProcessing)
+        if (isProcessing || battleEnded)
             return;
 
         if (attackerIndex < 0 ||
@@ -836,6 +839,92 @@ public class Game : MonoBehaviour
             Quaternion.identity
         );
     }
+        public bool IsBattleComplete()
+    {
+        foreach (HoverEffect enemyHover in enemies)
+        {
+            if (enemyHover == null)
+                continue;
+
+            CharacterStat enemyStat = enemyHover.GetComponent<CharacterStat>();
+
+            if (enemyStat != null && enemyStat.hp > 0)
+                return false;   // ยังมีศัตรูเหลือ hp > 0
+        }
+
+        return true;   // ศัตรูตายหมด = จบด่าน
+    }
+
+    private bool CheckBattleComplete()
+{
+    if (battleEnded)
+        return false;
+
+    if (!IsBattleComplete())
+        return false;
+
+    battleEnded = true;
+
+    Debug.Log(
+        "All enemies defeated! Level complete."
+    );
+
+    if (levelManager != null)
+    {
+        levelManager.OnLevelCompleted();
+    }
+    else
+    {
+        Debug.LogWarning(
+            "LevelManager is not assigned on Game — can't advance to the next level."
+        );
+    }
+
+    return true; // การเรียกครั้งนี้แหละที่เพิ่งทำให้ด่านจบ
+}
+    public void ApplyEnemyStats(int maxHp, int atk, int unique)
+    {
+        if (enemies.Count == 0 || enemies[0] == null)
+            return;
+
+        CharacterStat stat = enemies[0].GetComponent<CharacterStat>();
+
+        if (stat == null)
+            return;
+
+        if (maxHp > 0)
+            stat.maxHp = maxHp;
+
+        if (atk > 0)
+            stat.atk = atk;
+
+        if (unique > 0)
+            stat.unique = unique;
+
+        stat.hp = stat.maxHp; // ฮีลเต็มให้พร้อมสู้ยกใหม่
+    }
+    public void ResetForNewLevel()
+    {
+        currentAttacker = null;
+        currentAttackerIndex = -1;
+        isUniqueAction = false;
+        isProcessing = false;
+        battleEnded = false;
+
+        previousAvailability.Clear();
+
+        foreach (HoverEffect character in characters)
+        {
+            if (character != null)
+                character.SetAvailable(true);
+        }
+
+        foreach (Button btn in takeDamageButtons)
+        {
+            if (btn != null)
+                btn.gameObject.SetActive(false);
+        }
+    }
 
     // ============================================================
     // PAUSE THEN RESOLVE
@@ -871,6 +960,9 @@ public class Game : MonoBehaviour
         currentAttackerIndex = -1;
         isUniqueAction = false;
         isProcessing = false;
+        
+        if (CheckBattleComplete())
+    yield break;
 
         if (attackerWasPlayer)
         {
@@ -887,6 +979,7 @@ public class Game : MonoBehaviour
     private IEnumerator AlliesAutoAttack()
     {
         isProcessing = true;
+        bool battleJustEnded = false;
 
         Debug.Log(
             "Mage, Healer, and Tank attack automatically!"
@@ -1096,14 +1189,22 @@ public class Game : MonoBehaviour
                 );
             }
 
+                        if (CheckBattleComplete())
+                battleJustEnded = true;
+
             yield return new WaitForSeconds(1f);
+
+            if (battleJustEnded)
+                break;
         }
 
         isProcessing = false;
 
+        if (battleJustEnded)
+            yield break;
+
         EndTurn();
     }
-
     // ============================================================
     // END TURN
     // ============================================================
@@ -1124,6 +1225,9 @@ public class Game : MonoBehaviour
 
     private IEnumerator EndTurnRoutine()
     {
+        if (battleEnded)
+            yield break;
+
         isProcessing = true;
 
         for (int i = 0;

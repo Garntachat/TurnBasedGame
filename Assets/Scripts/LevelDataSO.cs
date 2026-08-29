@@ -16,5 +16,9 @@ public class EnemySpawnData
 {
     public GameObject enemyPrefab;
     public int spawnPointIndex;
+    [Header("Enemy Stats for this level (0 = leave unchanged)")]
+    public int maxHp = 0;
+    public int atk = 0;
+    public int unique = 0;
 }
 
