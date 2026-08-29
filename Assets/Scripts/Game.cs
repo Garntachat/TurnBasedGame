@@ -40,6 +40,7 @@ public class Game : MonoBehaviour
 
     [Range(0f, 1f)]
     public float betrayalUseUniqueChance = 0.5f;
+    [Range(0f, 1f)] public float betrayalTargetAllyChance = 0.7f;
 
     private int traitorIndex = -1;
 
@@ -603,7 +604,6 @@ public class Game : MonoBehaviour
     // ============================================================
     // BETRAYAL
     // ============================================================
-
     private bool TryResolveBetrayal()
     {
         if (currentAttackerIndex != traitorIndex)
@@ -650,43 +650,22 @@ public class Game : MonoBehaviour
         // FIND BETRAYAL TARGET
         // ========================================================
 
-        List<HoverEffect> validTargets =
-            new List<HoverEffect>();
-
-        for (int i = 0;
-             i < characters.Count;
-             i++)
+        HoverEffect betrayTargetHover = null;
+        if (Random.value < betrayalTargetAllyChance)
         {
-            if (i == currentAttackerIndex)
-                continue;
+            betrayTargetHover = PickMaliciousAllyTarget(currentAttackerIndex);
 
-            CharacterStat stat =
-                characters[i]
-                    .GetComponent<CharacterStat>();
-
-            if (stat != null &&
-                stat.hp > 0)
+            if (betrayTargetHover == null && enemies.Count > 0)
             {
-                validTargets.Add(
-                    characters[i]
-                );
+                CharacterStat enemyStat = enemies[0].GetComponent<CharacterStat>();
+                if (enemyStat != null && enemyStat.hp > 0)
+                    betrayTargetHover = enemies[0];
             }
         }
 
-        if (validTargets.Count == 0)
-            return false;
+        if (betrayTargetHover == null) return false;
 
-        HoverEffect betrayTargetHover =
-            validTargets[
-                Random.Range(
-                    0,
-                    validTargets.Count
-                )
-            ];
-
-        CharacterStat betrayTarget =
-            betrayTargetHover
-                .GetComponent<CharacterStat>();
+        CharacterStat betrayTarget = betrayTargetHover.GetComponent<CharacterStat>();
 
         // ========================================================
         // BETRAYAL UNIQUE
@@ -775,6 +754,33 @@ public class Game : MonoBehaviour
         );
 
         return true;
+    }
+
+    private HoverEffect PickMaliciousAllyTarget(int traitorIdx)
+    {
+        HoverEffect healerTarget = null;
+        HoverEffect lowestHpTarget = null;
+        int lowestHp = int.MaxValue;
+
+        for (int i = 0; i < characters.Count; i++)
+        {
+            if (i == traitorIdx) continue;
+            if (enemies.Contains(characters[i])) continue;
+
+            CharacterStat stat = characters[i].GetComponent<CharacterStat>();
+            if (stat == null || stat.hp <= 0) continue; // not found or dead
+
+            if (stat.role == CharacterClass.Healer)
+                healerTarget = characters[i];
+
+            if (stat.hp < lowestHp)
+            {
+                lowestHp = stat.hp;
+                lowestHpTarget = characters[i];
+            }
+        }
+
+        return healerTarget != null ? healerTarget : lowestHpTarget;
     }
 
     // ============================================================
@@ -880,6 +886,29 @@ public class Game : MonoBehaviour
 
             HoverEffect chosenTargetHover = null;
             CharacterStat chosenTarget = null;
+            bool traitorUsedUnique = false;
+
+            if (i == traitorIndex && Random.value < betrayalChance)
+            {
+                bool useUnique = Random.value < betrayalUseUniqueChance;
+
+                if (useUnique && allyStat.role == CharacterClass.Tank)
+                {
+                     Debug.Log(characters[i].name + " ignored the team and guarded instead!");
+                    ApplyUniqueEffect(allyStat, null);
+                    yield return new WaitForSeconds(1f);
+                    continue;
+                }
+                if (Random.value < betrayalTargetAllyChance)
+                {
+                    chosenTargetHover = PickMaliciousAllyTarget(i);
+                    if (chosenTargetHover != null)
+                    {
+                        chosenTarget = chosenTargetHover.GetComponent<CharacterStat>();
+                        Debug.Log(characters[i].name + " ignored the team and targeted " + chosenTargetHover.name + " on purpose!");
+                    }
+                }
+            }
 
             bool attackAlly =
                 Random.value <
@@ -889,7 +918,7 @@ public class Game : MonoBehaviour
             // FRIENDLY FIRE
             // ====================================================
 
-            if (attackAlly)
+            if (chosenTarget == null && attackAlly)
             {
                 List<HoverEffect> validAllyTargets =
                     new List<HoverEffect>();
@@ -994,6 +1023,13 @@ public class Game : MonoBehaviour
             // ====================================================
             // DAMAGE
             // ====================================================
+
+            if (traitorUsedUnique)
+            {
+                ApplyUniqueEffect(allyStat, chosenTarget);
+                yield return new WaitForSeconds(1f);
+                continue;
+            }
 
             chosenTarget.hp -= allyStat.atk;
 
