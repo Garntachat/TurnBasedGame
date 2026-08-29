@@ -3142,7 +3142,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CharacterStat
   maxHp: 110
   hp: 110
-  atk: 30
+  atk: 100
   unique: 45
   role: 0
   isGuarding: 0

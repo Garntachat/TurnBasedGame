@@ -52,7 +52,7 @@ public class HoverEffect : MonoBehaviour
     private void UpdateAvailableStatus()
     {
         CharacterStat stat = GetComponent<CharacterStat>();
-        bool isAlive = (stat != null || stat.hp > 0);
+        bool isAlive = (stat == null || stat.hp > 0);
         if (availableStatus != null)
             availableStatus.SetActive(available && isAlive);
     }
