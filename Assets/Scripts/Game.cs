@@ -232,6 +232,27 @@ public class Game : MonoBehaviour
 
         if (isUniqueAction)
         {
+            int uniqueFinalTargetIndex = characterIndex;
+
+            if (Random.value < normalAttackMissTargetChance)
+            {
+                List<int> alternateIndices = new List<int>();
+                for (int i = 0; i < characters.Count; i++)
+                {
+                    if (i == currentAttackerIndex) continue;
+                    if (i == characterIndex) continue;
+
+                    CharacterStat stat = characters[i].GetComponent<CharacterStat>();
+                    if (stat != null && stat.hp > 0)
+                        alternateIndices.Add(i);
+                }
+
+                if (alternateIndices.Count > 0)
+                {
+                    uniqueFinalTargetIndex = alternateIndices[Random.Range(0, alternateIndices.Count)];
+                    Debug.Log(currentAttacker.name + "'s skill missed and hit " + characters[uniqueFinalTargetIndex].name + " instead!");
+                }
+            }
             CharacterStat uniqueTarget =
                 characters[characterIndex]
                     .GetComponent<CharacterStat>();

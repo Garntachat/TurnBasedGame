@@ -15,6 +15,9 @@ public class CharacterStat : MonoBehaviour
     public Text atkText;
     public Text uniqueText;
 
+    [Header("HP Bar")]
+    public Image hpBarFill;
+
     void Start()
     {
         UpdateStatText();
@@ -38,5 +41,11 @@ void UpdateStatText()
 
     if (uniqueText != null)
         uniqueText.text = unique.ToString();
+    if (hpBarFill != null && maxHp > 0){
+        RectTransform rt = hpBarFill.rectTransform;
+        Vector3 scale = rt.localScale;
+        scale.x = Mathf.Clamp01((float)hp / maxHp);
+        rt.localScale = scale;
+    }
 }
 }
