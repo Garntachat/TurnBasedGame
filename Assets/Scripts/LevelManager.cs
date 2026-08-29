@@ -10,7 +10,14 @@ public class LevelManager : MonoBehaviour
 
     private int currentLevelIndex = 0;
     private List<GameObject> spawnEnemeis = new();
-
+    private void Start() => LoadLevel(0);
+    private void Update()
+{
+    if (Input.GetKeyDown(KeyCode.T)) // กด T เพื่อจำลองว่าจบด่าน
+    {
+        OnLevelCompleted();
+    }
+}
     public void OnLevelCompleted() // when the player cleared current level
     {
         ClearEnemies();

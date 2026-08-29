@@ -20,4 +20,8 @@ public class TransitionSequence : MonoBehaviour
         dialoguePanel.SetActive(false);
         onComplete?.Invoke();
     }
+    private void Awake()
+    {
+        dialoguePanel.SetActive(false);
+    }
 }

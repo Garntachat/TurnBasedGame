@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LevelDataSO
   levelName: Level3
   enemies:
-  - enemyPrefab: {fileID: 0}
+  - enemyPrefab: {fileID: 919132149155446097, guid: 4ae14a67b39045a4aa40143843f7bfcc, type: 3}
     spawnPointIndex: 0
   monologueLines: []
   secondPerLine: 2
