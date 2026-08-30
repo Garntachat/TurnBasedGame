@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LevelDataSO
   levelName: Level3
   enemies:
-  - enemyPrefab: {fileID: 919132149155446097, guid: adaeac9788ea82e4eb6ff989b1e20f0e, type: 3}
+  - enemyPrefab: {fileID: 919132149155446097, guid: 2caf404237e4c034c92373871fb91c95, type: 3}
     spawnPointIndex: 0
     maxHp: 170
     atk: 40
