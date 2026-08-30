@@ -9515,7 +9515,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: '::'
   maxHp: 75
   hp: 75
-  atk: 10
+  atk: 20
   unique: 0
   role: 0
   isGuarding: 0

@@ -854,11 +854,18 @@ public class Game : MonoBehaviour
             return;
         }
 
-        Instantiate(
+        GameObject instance = Instantiate(
             prefab,
             target.transform.position,
             Quaternion.identity
         );
+
+        ParticleSystem ps = instance.GetComponent<ParticleSystem>();
+        float lifetime = (ps != null)
+            ? ps.main.duration + ps.main.startLifetime.constantMax
+            : 2f;
+
+        Destroy(instance, lifetime);
     }
         public bool IsBattleComplete()
     {
