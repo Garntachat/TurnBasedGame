@@ -8,6 +8,7 @@ public class LevelDataSO : ScriptableObject
     [TextArea] public string[] monologueLines;
     public float secondPerLine = 2f;
     public bool isCampPhase ; // true for level 2->3 and 5->6
+    public bool allowKillTeammate = false;
 
 }
 

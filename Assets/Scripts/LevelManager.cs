@@ -8,6 +8,7 @@ public class LevelManager : MonoBehaviour
 
     [SerializeField] private TransitionSequence transitionSequence;
     [SerializeField] private Game game;
+    [SerializeField] private CampPhaseManager campPhaseManager;
 
     private int currentLevelIndex = 0;
     private List<GameObject> spawnEnemeis = new();
@@ -21,7 +22,7 @@ public class LevelManager : MonoBehaviour
 
         if (currentLevelIndex >= levels.Length) return; //player has played all 6 levels
 
-        transitionSequence.PlayAuto(levels[currentLevelIndex], () => LoadLevel(currentLevelIndex));
+        transitionSequence.PlayAuto(levels[currentLevelIndex], () => HandleAfterTransition(currentLevelIndex));
     }
 
     private void ClearEnemies()
@@ -44,4 +45,15 @@ public class LevelManager : MonoBehaviour
         if (game != null)
             game.ResetForNewLevel();
     }
+    private void HandleAfterTransition(int index)
+{
+    if (levels[index].isCampPhase && campPhaseManager != null)
+    {
+        campPhaseManager.ShowCampPhase(levels[index].allowKillTeammate, () => LoadLevel(index));
+    }
+    else
+    {
+        LoadLevel(index);
+    }
+}
 }

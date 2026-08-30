@@ -22,4 +22,5 @@ MonoBehaviour:
   monologueLines:
   - '"Hmm why some teammates don''t do as I order"'
   secondPerLine: 2
-  isCampPhase: 1
+  isCampPhase: 0
+  allowKillTeammate: 0

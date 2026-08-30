@@ -206,7 +206,7 @@ public class Game : MonoBehaviour
 
     public void OnTakeDamageButtonClick(int characterIndex)
     {
-        if (isProcessing)
+        if (isProcessing || battleEnded)
             return;
 
         if (characterIndex < 0 ||
@@ -424,7 +424,7 @@ public class Game : MonoBehaviour
 
     public void OnUniqueButtonClick(int casterIndex)
     {
-        if (isProcessing)
+        if (isProcessing || battleEnded)
             return;
 
         if (casterIndex < 0 ||
@@ -903,7 +903,63 @@ public class Game : MonoBehaviour
 
         stat.hp = stat.maxHp; // ฮีลเต็มให้พร้อมสู้ยกใหม่
     }
-    public void ResetForNewLevel()
+
+        public List<int> GetAliveTeammateIndices()
+    {
+        List<int> result = new List<int>();
+
+        for (int i = 1; i <= 3; i++)
+        {
+            if (i >= characters.Count) continue;
+
+            CharacterStat stat = characters[i].GetComponent<CharacterStat>();
+            if (stat != null && stat.hp > 0)
+                result.Add(i);
+        }
+
+        return result;
+    }
+
+    public void UpgradeWholeTeam(int hpBonus, int atkBonus)
+    {
+        for (int i = 0; i <= 3; i++)
+        {
+            if (i >= characters.Count) continue;
+
+            CharacterStat stat = characters[i].GetComponent<CharacterStat>();
+            if (stat == null || stat.hp <= 0) continue;
+
+            stat.maxHp += hpBonus;
+            stat.hp += hpBonus;
+            stat.atk += atkBonus;
+        }
+    }
+
+    public void UpgradeOneCharacter(int index, int hpBonus, int atkBonus)
+    {
+        if (index < 0 || index >= characters.Count) return;
+
+        CharacterStat stat = characters[index].GetComponent<CharacterStat>();
+        if (stat == null || stat.hp <= 0) return;
+
+        stat.maxHp += hpBonus;
+        stat.hp += hpBonus;
+        stat.atk += atkBonus;
+    }
+
+    public void KillTeammate(int index)
+    {
+        if (index < 0 || index >= characters.Count) return;
+
+        CharacterStat stat = characters[index].GetComponent<CharacterStat>();
+        if (stat == null) return;
+
+        stat.hp = 0;
+        characters[index].SetAvailable(false);
+
+        Debug.Log(characters[index].name + " was sacrificed.");
+    }
+        public void ResetForNewLevel()
     {
         currentAttacker = null;
         currentAttackerIndex = -1;
@@ -913,10 +969,14 @@ public class Game : MonoBehaviour
 
         previousAvailability.Clear();
 
-        foreach (HoverEffect character in characters)
+        for (int i = 0; i < characters.Count; i++)
         {
-            if (character != null)
-                character.SetAvailable(true);
+            if (characters[i] == null)
+                continue;
+
+            // เปิดให้กดได้แค่ตัวเรา (index 0) กับศัตรู — ลูกน้องไม่เปิดจนกว่าจะมีระบบ Order
+            bool shouldBeAvailable = (i == 0) || enemies.Contains(characters[i]);
+            characters[i].SetAvailable(shouldBeAvailable);
         }
 
         foreach (Button btn in takeDamageButtons)
@@ -1211,7 +1271,7 @@ public class Game : MonoBehaviour
 
     public void EndTurn()
     {
-        if (isProcessing)
+        if (isProcessing || battleEnded)
             return;
 
         StartCoroutine(
@@ -1230,9 +1290,7 @@ public class Game : MonoBehaviour
 
         isProcessing = true;
 
-        for (int i = 0;
-             i < characters.Count;
-             i++)
+        for (int i = 0; i < characters.Count; i++)
         {
             characters[i].SetAvailable(
                 i == 0

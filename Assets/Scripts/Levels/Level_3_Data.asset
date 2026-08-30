@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LevelDataSO
   levelName: Level3
   enemies:
-  - enemyPrefab: {fileID: 2261531050308778029, guid: 046cebf40ced14bc7a3c5710f78377cf, type: 3}
+  - enemyPrefab: {fileID: 919132149155446097, guid: adaeac9788ea82e4eb6ff989b1e20f0e, type: 3}
     spawnPointIndex: 0
     maxHp: 50
     atk: 3
@@ -24,4 +24,5 @@ MonoBehaviour:
   - '"sjglwsg"'
   - '"no idea"'
   secondPerLine: 2
-  isCampPhase: 0
+  isCampPhase: 1
+  allowKillTeammate: 0

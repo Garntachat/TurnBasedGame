@@ -21,4 +21,5 @@ MonoBehaviour:
     unique: 5
   monologueLines: []
   secondPerLine: 2
-  isCampPhase: 1
+  isCampPhase: 0
+  allowKillTeammate: 0
