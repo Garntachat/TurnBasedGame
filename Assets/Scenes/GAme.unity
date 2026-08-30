@@ -303,6 +303,7 @@ MonoBehaviour:
   enemies:
   - {fileID: 1019320582}
   allyFriendlyFireChance: 0.35720924
+  allyAutoUniqueChance: 0.3
   normalAttackMissTargetChance: 0.2
   levelManager: {fileID: 914037241}
   sfxSource: {fileID: 1202442}
@@ -317,7 +318,6 @@ MonoBehaviour:
   betrayalChance: 0.3
   betrayalUseUniqueChance: 0.5
   betrayalTargetAllyChance: 0.7
-  allyAutoUniqueChance: 0.3
   hitParticlePrefab: {fileID: 7328395568464482303, guid: 2e848fc1ae2d1cb458e83368d7607964, type: 3}
   allyHitParticlePrefab: {fileID: 7328395568464482303, guid: 2e848fc1ae2d1cb458e83368d7607964, type: 3}
   attackerHitParticlePrefab: {fileID: 8414350240151877871, guid: d6af5744b76f44a4783684e305b364a0, type: 3}
@@ -1767,8 +1767,10 @@ MonoBehaviour:
   selectSelfButton: {fileID: 1759114965}
   teamHpBonus: 10
   teamAtkBonus: 2
+  teamUniqueBonus: 3
   soloHpBonus: 25
   soloAtkBonus: 5
+  soloUniqueBonus: 8
 --- !u!4 &237218585
 Transform:
   m_ObjectHideFlags: 0
@@ -9513,7 +9515,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: '::'
   maxHp: 75
   hp: 75
-  atk: 10
+  atk: 20
   unique: 0
   role: 0
   isGuarding: 0
