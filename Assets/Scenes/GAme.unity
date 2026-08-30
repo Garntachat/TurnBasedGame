@@ -302,8 +302,8 @@ MonoBehaviour:
   - {fileID: 595964913}
   enemies:
   - {fileID: 1019320582}
-  allyFriendlyFireChance: 0.35720924
-  allyAutoUniqueChance: 0.3
+  allyFriendlyFireChance: 0.15
+  allyAutoUniqueChance: 0.35
   normalAttackMissTargetChance: 0.2
   levelManager: {fileID: 914037241}
   sfxSource: {fileID: 1202442}
@@ -315,7 +315,7 @@ MonoBehaviour:
   - {fileID: 301176068}
   - {fileID: 1950036498}
   - {fileID: 48168}
-  betrayalChance: 0.3
+  betrayalChance: 0.35
   betrayalUseUniqueChance: 0.5
   betrayalTargetAllyChance: 0.7
   hitParticlePrefab: {fileID: 7328395568464482303, guid: 2e848fc1ae2d1cb458e83368d7607964, type: 3}
