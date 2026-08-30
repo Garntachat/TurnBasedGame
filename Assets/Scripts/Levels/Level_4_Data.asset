@@ -16,9 +16,11 @@ MonoBehaviour:
   enemies:
   - enemyPrefab: {fileID: 2755475677709858934, guid: 032433de7a19e4d07b832b7afc77d4b2, type: 3}
     spawnPointIndex: 0
-    maxHp: 60
-    atk: 4
+    maxHp: 200
+    atk: 50
     unique: 4
-  monologueLines: []
-  secondPerLine: 2
+  monologueLines:
+  - '"That attack shouldn''t have missed like that."'
+  secondPerLine: 4
   isCampPhase: 0
+  allowKillTeammate: 0

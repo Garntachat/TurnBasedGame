@@ -21,8 +21,10 @@ public class CampPhaseManager : MonoBehaviour
     [Header("Upgrade Amounts")]
     public int teamHpBonus = 10;
     public int teamAtkBonus = 2;
+    public int teamUniqueBonus = 3;
     public int soloHpBonus = 25;
     public int soloAtkBonus = 5;
+    public int soloUniqueBonus = 8;
 
     private System.Action onDone;
     private bool selectingForKill;
@@ -55,7 +57,7 @@ public class CampPhaseManager : MonoBehaviour
 
     private void OnUpgradeTeamClicked()
     {
-        game.UpgradeWholeTeam(teamHpBonus, teamAtkBonus);
+        game.UpgradeWholeTeam(teamHpBonus, teamAtkBonus, teamUniqueBonus);
         Finish();
     }
 
@@ -94,7 +96,7 @@ public class CampPhaseManager : MonoBehaviour
         if (selectingForKill)
             game.KillTeammate(allyIndex);
         else
-            game.UpgradeOneCharacter(allyIndex, soloHpBonus, soloAtkBonus);
+            game.UpgradeOneCharacter(allyIndex, soloHpBonus, soloAtkBonus, soloUniqueBonus);
 
         characterSelectPanel.SetActive(false);
         Finish();

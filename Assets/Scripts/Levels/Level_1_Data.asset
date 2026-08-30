@@ -16,10 +16,11 @@ MonoBehaviour:
   enemies:
   - enemyPrefab: {fileID: 919132149155446097, guid: adaeac9788ea82e4eb6ff989b1e20f0e, type: 3}
     spawnPointIndex: 0
-    maxHp: 30
+    maxHp: 110
     atk: 30
-    unique: 2
+    unique: 4
   monologueLines:
-  - '"Hmm why some teammates don''t do as I order"'
-  secondPerLine: 5
+  - '"This team... are we really ready for this?"'
+  secondPerLine: 3.5
   isCampPhase: 0
+  allowKillTeammate: 0

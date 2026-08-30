@@ -16,10 +16,11 @@ MonoBehaviour:
   enemies:
   - enemyPrefab: {fileID: 2755475677709858934, guid: 032433de7a19e4d07b832b7afc77d4b2, type: 3}
     spawnPointIndex: 0
-    maxHp: 70
-    atk: 5
+    maxHp: 210
+    atk: 40
     unique: 5
-  monologueLines: []
-  secondPerLine: 2
+  monologueLines:
+  - '"Someone in this group isn''t fighting for us."'
+  secondPerLine: 4
   isCampPhase: 0
   allowKillTeammate: 0

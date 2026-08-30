@@ -16,11 +16,11 @@ MonoBehaviour:
   enemies:
   - enemyPrefab: {fileID: 919132149155446097, guid: adaeac9788ea82e4eb6ff989b1e20f0e, type: 3}
     spawnPointIndex: 0
-    maxHp: 40
-    atk: 2
+    maxHp: 125
+    atk: 25
     unique: 2
   monologueLines:
-  - '"Hmm why some teammates don''t do as I order"'
-  secondPerLine: 2
+  - '"Is it bad luck, or are we just not good enough?"'
+  secondPerLine: 4
   isCampPhase: 0
   allowKillTeammate: 0

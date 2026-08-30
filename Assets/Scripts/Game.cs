@@ -20,6 +20,8 @@ public class Game : MonoBehaviour
     [Header("Ally Auto-Attack Settings")]
     [Range(0f, 1f)]
     public float allyFriendlyFireChance = 0.2f;
+    [Range(0f, 1f)] public float allyAutoUniqueChance = 0.3f;
+
 
     [Header("Normal Attack Settings")]
     [Range(0f, 1f)]
@@ -939,7 +941,7 @@ public class Game : MonoBehaviour
         return result;
     }
 
-    public void UpgradeWholeTeam(int hpBonus, int atkBonus)
+    public void UpgradeWholeTeam(int hpBonus, int atkBonus,int uniqueBonus)
     {
         for (int i = 0; i <= 3; i++)
         {
@@ -951,10 +953,11 @@ public class Game : MonoBehaviour
             stat.maxHp += hpBonus;
             stat.hp += hpBonus;
             stat.atk += atkBonus;
+            stat.unique += uniqueBonus;
         }
     }
 
-    public void UpgradeOneCharacter(int index, int hpBonus, int atkBonus)
+    public void UpgradeOneCharacter(int index, int hpBonus, int atkBonus, int uniqueBonus)
     {
         if (index < 0 || index >= characters.Count) return;
 
@@ -964,6 +967,7 @@ public class Game : MonoBehaviour
         stat.maxHp += hpBonus;
         stat.hp += hpBonus;
         stat.atk += atkBonus;
+        stat.unique += uniqueBonus;
     }
 
     public void KillTeammate(int index)
@@ -1080,6 +1084,7 @@ public class Game : MonoBehaviour
             HoverEffect chosenTargetHover = null;
             CharacterStat chosenTarget = null;
             bool traitorUsedUnique = false;
+            bool allyUsedUnique = false;
 
             if (i == traitorIndex && Random.value < betrayalChance)
             {
@@ -1098,9 +1103,19 @@ public class Game : MonoBehaviour
                     if (chosenTargetHover != null)
                     {
                         chosenTarget = chosenTargetHover.GetComponent<CharacterStat>();
+                        traitorUsedUnique = useUnique;
                         Debug.Log(characters[i].name + " ignored the team and targeted " + chosenTargetHover.name + " on purpose!");
                     }
                 }
+            } else if (allyStat.role == CharacterClass.Tank && Random.value < allyAutoUniqueChance)
+            {
+                Debug.Log(characters[i].name + " decided to guard the team!");
+                ApplyUniqueEffect(allyStat, null);
+                yield return new WaitForSeconds(1f);
+                continue;
+            } else if (allyStat.role == CharacterClass.Mage && Random.value < allyAutoUniqueChance)
+            {
+                allyUsedUnique = true;   // ตั้งใจใช้ unique แต่ยังไม่เลือกเป้าหมาย — ปล่อยให้ logic ด้านล่างเลือกให้
             }
 
             bool attackAlly =
@@ -1218,7 +1233,7 @@ public class Game : MonoBehaviour
             // DAMAGE
             // ====================================================
 
-            if (traitorUsedUnique)
+            if (traitorUsedUnique || allyUsedUnique)
             {
                 ApplyUniqueEffect(allyStat, chosenTarget);
                 yield return new WaitForSeconds(1f);
@@ -1271,13 +1286,13 @@ public class Game : MonoBehaviour
                 );
             }
 
-                        if (CheckBattleComplete())
+            yield return new WaitForSeconds(2f);
+
+            if (CheckBattleComplete())
+            {
                 battleJustEnded = true;
-
-            yield return new WaitForSeconds(1f);
-
-            if (battleJustEnded)
                 break;
+            }
         }
 
         isProcessing = false;
