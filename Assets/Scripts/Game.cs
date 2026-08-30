@@ -27,6 +27,13 @@ public class Game : MonoBehaviour
     [Header("Level")]
     public LevelManager levelManager;
 
+    [Header("Sound Effects")]
+    public AudioSource sfxSource;
+    public AudioClip hitSound;
+    [Header("Background Musics")]
+    public AudioSource musicSource;
+    public AudioClip bgMusic;
+
     private CharacterStat currentAttacker;
     private int currentAttackerIndex = -1;
     private List<bool> previousAvailability = new List<bool>();
@@ -65,6 +72,12 @@ public class Game : MonoBehaviour
 
     void Start()
     {
+        if (musicSource != null && bgMusic != null)
+        {
+            musicSource.clip = bgMusic;
+            musicSource.loop = true;
+            musicSource.Play();
+        }
         for (int i = 0; i < attackButtons.Count; i++)
         {
             int index = i;
@@ -385,6 +398,7 @@ public class Game : MonoBehaviour
                 hitParticlePrefab,
                 target.gameObject
             );
+            PlaySound(hitSound, 0.18f);
         }
         else
         {
@@ -393,6 +407,7 @@ public class Game : MonoBehaviour
                 allyHitParticlePrefab,
                 target.gameObject
             );
+            PlaySound(hitSound, 0.18f);
         }
 
         Debug.Log(
@@ -591,6 +606,7 @@ public class Game : MonoBehaviour
                         hitParticlePrefab,
                         target.gameObject
                     );
+                    PlaySound(hitSound, 0.18f);
                 }
                 else
                 {
@@ -598,6 +614,7 @@ public class Game : MonoBehaviour
                         allyHitParticlePrefab,
                         target.gameObject
                     );
+                    PlaySound(hitSound, 0.18f);
                 }
 
                 if (target.hp <= 0)
@@ -745,6 +762,7 @@ public class Game : MonoBehaviour
                     hitParticlePrefab,
                     betrayTarget.gameObject
                 );
+                PlaySound(hitSound, 0.18f);
             }
             else
             {
@@ -752,6 +770,7 @@ public class Game : MonoBehaviour
                     allyHitParticlePrefab,
                     betrayTarget.gameObject
                 );
+                PlaySound(hitSound, 0.18f);
             }
 
             Debug.Log(
@@ -1138,6 +1157,7 @@ public class Game : MonoBehaviour
                 allyStat.gameObject
             );
 
+
             // ====================================================
             // DAMAGE
             // ====================================================
@@ -1163,6 +1183,7 @@ public class Game : MonoBehaviour
                     allyHitParticlePrefab,
                     chosenTarget.gameObject
                 );
+                PlaySound(hitSound, 0.18f);
             }
             else
             {
@@ -1171,6 +1192,7 @@ public class Game : MonoBehaviour
                     hitParticlePrefab,
                     chosenTarget.gameObject
                 );
+                PlaySound(hitSound, 0.18f);
             }
 
             Debug.Log(
@@ -1354,6 +1376,7 @@ public class Game : MonoBehaviour
                 enemyStat.gameObject
             );
 
+
             // ====================================================
             // DAMAGE
             // ====================================================
@@ -1369,6 +1392,7 @@ public class Game : MonoBehaviour
                 allyHitParticlePrefab,
                 chosenTarget.gameObject
             );
+            PlaySound(hitSound, 0.18f);
 
             Debug.Log(
                 enemyHover.name +
@@ -1407,5 +1431,18 @@ public class Game : MonoBehaviour
         }
 
         isProcessing = false;
+    }
+
+    private void PlaySound(AudioClip clip, float delay = 0f)
+    {
+        if (sfxSource == null || clip == null) return; 
+        StartCoroutine(PlaySoundDelayed(clip, delay));
+    }
+
+    private IEnumerator PlaySoundDelayed(AudioClip clip, float delay)
+    {
+        if (delay > 0f)
+            yield return new WaitForSeconds(delay);
+        sfxSource.PlayOneShot(clip);
     }
 }
